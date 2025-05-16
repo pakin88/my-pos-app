@@ -178,20 +178,6 @@ if menu == "ดูสรุปยอด":
     expense_df.index += 1
     expense_df.index.name = "ลำดับ"
     st.dataframe(expense_df)
-    st.markdown("### 📆 รายรับ-รายจ่ายรายวัน")
-    # รวมข้อมูลรายวัน
-    income_df["date"] = pd.to_datetime(income_df["date"]).dt.date
-    expense_df["date"] = pd.to_datetime(expense_df["date"]).dt.date
-
-    income_daily = income_df.groupby("date")["amount"].sum()
-    expense_daily = expense_df.groupby("date")["amount"].sum()
-
-    daily_df = pd.DataFrame({
-        "รายรับ": income_daily,
-        "รายจ่าย": expense_daily
-    }).fillna(0)
-
-    st.line_chart(daily_df)
 
 
 if menu == "แดชบอร์ด":
