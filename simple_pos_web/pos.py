@@ -40,7 +40,7 @@ def clear_income_input(key1,key2):
     st.session_state[key1] = ""
     st.session_state[key2] = 0.0
 
-menu = st.sidebar.selectbox("ตัวเลือก", ["รายรับ", "รายจ่าย","เพิ่มรายการสินค้า", "แดชบอร์ด"])
+menu = st.sidebar.selectbox("ตัวเลือก", ["รายรับ", "รายจ่าย","เพิ่มรายการสินค้า", "ดูสรุปยอด"])
 
 if menu == "เพิ่มรายการสินค้า":
     st.subheader("เพิ่มรายการสินค้า")
@@ -178,6 +178,21 @@ if menu == "ดูสรุปยอด":
     expense_df.index += 1
     expense_df.index.name = "ลำดับ"
     st.dataframe(expense_df)
+    st.markdown("### 📆 รายรับ-รายจ่ายรายวัน")
+    # รวมข้อมูลรายวัน
+    income_df["date"] = pd.to_datetime(income_df["date"]).dt.date
+    expense_df["date"] = pd.to_datetime(expense_df["date"]).dt.date
+
+    income_daily = income_df.groupby("date")["amount"].sum()
+    expense_daily = expense_df.groupby("date")["amount"].sum()
+
+    daily_df = pd.DataFrame({
+        "รายรับ": income_daily,
+        "รายจ่าย": expense_daily
+    }).fillna(0)
+
+    st.line_chart(daily_df)
+
 
 if menu == "แดชบอร์ด":
     st.subheader("📊 ภาพรวมระบบ POS")
@@ -212,8 +227,14 @@ if menu == "แดชบอร์ด":
     st.line_chart(daily_df)
 
     st.markdown("### 🧾 รายการล่าสุด")
+    income_df = income_df.reset_index(drop=True)
+    income_df.index += 1
+    income_df.index.name = "ลำดับ"
     st.write("**รายรับล่าสุด:**")
     st.dataframe(income_df.tail(5).reset_index(drop=True))
 
     st.write("**รายจ่ายล่าสุด:**")
+    expense_df = expense_df.reset_index(drop=True)
+    expense_df.index += 1
+    expense_df.index.name = "ลำดับ"
     st.dataframe(expense_df.tail(5).reset_index(drop=True))
